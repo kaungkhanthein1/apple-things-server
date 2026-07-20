@@ -49,5 +49,11 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "@medusajs/dashboard@2.13.1": "patches/@medusajs__dashboard@2.13.1.patch",
+      "@tsc_tech/medusa-plugin-cloudinary@1.0.0": "patches/@tsc_tech__medusa-plugin-cloudinary@1.0.0.patch"
+    }
+  }
 }

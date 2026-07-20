@@ -14,8 +14,22 @@ module.exports = defineConfig({
     vite: (config) => {
       const outDir = config.build?.outDir
 
+      config.plugins = (config.plugins ?? []).filter((plugin) => {
+        return plugin?.name !== "vite:react-refresh"
+      })
+
+      config.server = {
+        ...(config.server ?? {}),
+        hmr: {
+          ...(typeof config.server?.hmr === "object" && config.server.hmr !== null
+            ? config.server.hmr
+            : {}),
+          overlay: false,
+        },
+      }
+
       config.plugins = [
-        ...(config.plugins ?? []),
+        ...config.plugins,
         {
           name: "apple-things-login-brand",
           apply: "build",
@@ -108,7 +122,17 @@ module.exports = defineConfig({
         },
       ]
 
-      return config
+      const seenPluginKeys = new Set<string>()
+      config.plugins = (config.plugins ?? []).filter((plugin) => {
+        const key = `${plugin?.name ?? ""}:${plugin?.enforce ?? ""}`
+        if (seenPluginKeys.has(key)) {
+          return false
+        }
+        seenPluginKeys.add(key)
+        return true
+      })
+
+      return
     },
   },
   modules: {

@@ -1,0 +1,66 @@
+diff --git a/src/routes/inventory/inventory-list/components/use-inventory-table-columns.tsx b/src/routes/inventory/inventory-list/components/use-inventory-table-columns.tsx
+index c726fbf12ede665e0da225fc9cb300240b058237..bba3819f703b52fcbf1e2420bf56e8ebea3ccb0e 100644
+--- a/src/routes/inventory/inventory-list/components/use-inventory-table-columns.tsx
++++ b/src/routes/inventory/inventory-list/components/use-inventory-table-columns.tsx
+@@ -6,6 +6,7 @@ import { useMemo } from "react"
+ import { useTranslation } from "react-i18next"
+ import { PlaceholderCell } from "../../../../components/table/table-cells/common/placeholder-cell"
+ import { InventoryActions } from "./inventory-actions"
++import { getStylizedAmount } from "../../../../lib/money-amount-helpers"
+ 
+ /**
+  * Adds missing properties to the InventoryItemDTO type.
+@@ -83,6 +84,41 @@ export const useInventoryTableColumns = () => {
+           )
+         },
+       }),
++      columnHelper.accessor("variants", {
++        header: t("fields.price"),
++        cell: ({ getValue }) => {
++          const variants = getValue() as ProductVariantDTO[] | null
++          const prices = variants?.[0]?.prices || []
++
++          if (!prices.length) {
++            return <PlaceholderCell />
++          }
++
++          return (
++            <div className="flex flex-col gap-y-0.5">
++              {prices.map((price: any) => {
++                try {
++                  const formatted = getStylizedAmount(
++                    price.amount,
++                    price.currency_code
++                  )
++                  return (
++                    <span key={price.id} className="truncate text-xs text-ui-fg-subtle">
++                      {formatted}
++                    </span>
++                  )
++                } catch {
++                  return (
++                    <span key={price.id} className="truncate text-xs text-ui-fg-subtle">
++                      {price.amount} {price.currency_code?.toUpperCase()}
++                    </span>
++                  )
++                }
++              })}
++            </div>
++          )
++        },
++      }),
+       columnHelper.accessor("reserved_quantity", {
+         header: t("inventory.reserved"),
+         cell: ({ getValue }) => {
+diff --git a/src/routes/inventory/inventory-list/components/use-inventory-table-query.tsx b/src/routes/inventory/inventory-list/components/use-inventory-table-query.tsx
+index acf886a72c5099f76dc584ef137bd924b0734d71..6209b2dd7d07db9e2113a9d55b30d24982bd079f 100644
+--- a/src/routes/inventory/inventory-list/components/use-inventory-table-query.tsx
++++ b/src/routes/inventory/inventory-list/components/use-inventory-table-query.tsx
+@@ -61,6 +61,7 @@ export const useInventoryTableQuery = ({
+       location_id: params.location_id || [],
+     },
+     id: params.id ? params.id.split(",") : undefined,
++    fields: "*,*variants,*variants.prices",
+   }
+ 
+   return {
