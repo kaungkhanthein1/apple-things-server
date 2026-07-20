@@ -138,6 +138,14 @@ module.exports = defineConfig({
   modules: {
     auth: {
       resolve: "@medusajs/auth",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/auth-emailpass",
+            id: "emailpass",
+          },
+        ],
+      },
     },
     file: {
       resolve: "@medusajs/medusa/file",
