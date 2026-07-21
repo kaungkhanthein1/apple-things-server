@@ -173,6 +173,7 @@ module.exports = defineConfig({
       authCors: process.env.AUTH_CORS!,
       jwtSecret: process.env.JWT_SECRET || "supersecret",
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      bodyLimit: 10 * 1024 * 1024,
     }
   }
 } as any)
