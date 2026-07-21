@@ -1,31 +1,38 @@
 import { Modules, MedusaError } from "@medusajs/framework/utils"
-import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+
+type UploadedFile = {
+  originalname: string
+  mimetype: string
+  buffer: Buffer
+}
+
+type StoreUploadRequest = AuthenticatedMedusaRequest & {
+  files?: UploadedFile[]
+}
 
 export async function POST(
-  req: MedusaRequest,
+  req: StoreUploadRequest,
   res: MedusaResponse
 ) {
-  const { filename, mimeType, content } = req.body as {
-    filename?: string
-    mimeType?: string
-    content?: string
-  }
+  const input = req.files
 
-  if (!content || !filename || !mimeType) {
-    throw new MedusaError(
-      MedusaError.Types.INVALID_DATA,
-      "Missing filename, mimeType, or content (base64)"
-    )
+  if (!input?.length) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, "No files were uploaded")
   }
 
   const fileModule = req.scope.resolve(Modules.FILE)
 
-  const result = await fileModule.createFiles({
-    filename,
-    mimeType,
-    content,
-    access: "public",
-  })
+  const results = await Promise.all(
+    input.map((file) =>
+      fileModule.createFiles({
+        filename: file.originalname,
+        mimeType: file.mimetype,
+        content: file.buffer.toString("base64"),
+        access: "public",
+      })
+    )
+  )
 
-  res.status(200).json({ files: Array.isArray(result) ? result : [result] })
+  res.status(200).json({ files: results })
 }
