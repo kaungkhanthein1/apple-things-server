@@ -1,6 +1,5 @@
-import { uploadFilesWorkflow } from "@medusajs/core-flows"
+import { Modules, MedusaError } from "@medusajs/framework/utils"
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { MedusaError } from "@medusajs/framework/utils"
 
 export async function POST(
   req: MedusaRequest,
@@ -19,24 +18,14 @@ export async function POST(
     )
   }
 
-  try {
-    const { result } = await uploadFilesWorkflow(req.scope).run({
-      input: {
-        files: [
-          {
-            filename,
-            mimeType,
-            content,
-            access: "public",
-          },
-        ],
-      },
-    })
+  const fileModule = req.scope.resolve(Modules.FILE)
 
-    res.status(200).json({ files: result })
-  } catch (err) {
-    console.error("[store/uploads] Upload failed:", err)
-    const message = err instanceof Error ? err.message : "Upload failed"
-    res.status(500).json({ code: "upload_error", message })
-  }
+  const result = await fileModule.createFiles({
+    filename,
+    mimeType,
+    content,
+    access: "public",
+  })
+
+  res.status(200).json({ files: [result] })
 }
