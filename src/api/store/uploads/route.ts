@@ -1,37 +1,42 @@
 import { uploadFilesWorkflow } from "@medusajs/core-flows"
-import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { MedusaError } from "@medusajs/framework/utils"
 
-type UploadedFile = {
-  originalname: string
-  mimetype: string
-  buffer: Buffer
-}
-
-type StoreUploadRequest = AuthenticatedMedusaRequest & {
-  files?: UploadedFile[]
-}
-
 export async function POST(
-  req: StoreUploadRequest,
+  req: MedusaRequest,
   res: MedusaResponse
 ) {
-  const input = req.files
-
-  if (!input?.length) {
-    throw new MedusaError(MedusaError.Types.INVALID_DATA, "No files were uploaded")
+  const { filename, mimeType, content } = req.body as {
+    filename?: string
+    mimeType?: string
+    content?: string
   }
 
-  const { result } = await uploadFilesWorkflow(req.scope).run({
-    input: {
-      files: input.map((file) => ({
-        filename: file.originalname,
-        mimeType: file.mimetype,
-        content: file.buffer.toString("base64"),
-        access: "public",
-      })),
-    },
-  })
+  if (!content || !filename || !mimeType) {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      "Missing filename, mimeType, or content (base64)"
+    )
+  }
 
-  res.status(200).json({ files: result })
+  try {
+    const { result } = await uploadFilesWorkflow(req.scope).run({
+      input: {
+        files: [
+          {
+            filename,
+            mimeType,
+            content,
+            access: "public",
+          },
+        ],
+      },
+    })
+
+    res.status(200).json({ files: result })
+  } catch (err) {
+    console.error("[store/uploads] Upload failed:", err)
+    const message = err instanceof Error ? err.message : "Upload failed"
+    res.status(500).json({ code: "upload_error", message })
+  }
 }
