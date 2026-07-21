@@ -7,10 +7,10 @@ export default defineMiddlewares({
   routes: [
     {
       method: ["POST"],
-      matcher: "/store/customers/me/avatar",
+      matcher: "/store/uploads",
       middlewares: [
         authenticate("customer", ["session", "bearer"]),
-        upload.single("file"),
+        upload.array("files"),
       ],
     },
   ],
