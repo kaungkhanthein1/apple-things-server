@@ -1,5 +1,7 @@
 import { defineMiddlewares, authenticate } from "@medusajs/framework/http"
-import express from "express"
+import multer from "multer"
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
 
 export default defineMiddlewares({
   routes: [
@@ -8,7 +10,7 @@ export default defineMiddlewares({
       matcher: "/store/uploads",
       middlewares: [
         authenticate("customer", ["session", "bearer"]),
-        express.json({ limit: "10mb" }),
+        upload.array("files"),
       ],
     },
   ],
