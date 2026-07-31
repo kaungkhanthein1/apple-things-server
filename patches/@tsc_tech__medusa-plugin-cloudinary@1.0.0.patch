@@ -2,17 +2,22 @@ diff --git a/.medusa/server/src/providers/file-cloudinary/service.js b/.medusa/s
 index 865995feee90dfad2d105e387040e0801282a2de..41634784754805d593751365eb3bab922518c41c 100644
 --- a/.medusa/server/src/providers/file-cloudinary/service.js
 +++ b/.medusa/server/src/providers/file-cloudinary/service.js
-@@ -24,10 +24,11 @@ class CloudinaryFileProviderService extends utils_1.AbstractFileProviderService
+@@ -24,10 +24,10 @@ class CloudinaryFileProviderService extends utils_1.AbstractFileProviderService
      async upload(file) {
          const publicId = this.generatePublicId(file.filename);
-         // Convert binary-encoded string to Buffer
+         // Convert base64-encoded string to Buffer
 -        const buffer = Buffer.from(file.content, "binary");
 +        const buffer = Buffer.from(file.content, "base64");
          return new Promise((resolve, reject) => {
-+            const resourceType = file.mimeType?.startsWith("image/") ? "image" : "auto";
              const uploadStream = cloudinary_1.v2.uploader.upload_stream({
 -                resource_type: "auto",
-+                resource_type: resourceType,
++                resource_type: "image",
                  public_id: publicId,
                  folder: this.options_?.folderName || undefined,
              }, (error, result) => {
+@@ -44,7 +44,7 @@ class CloudinaryFileProviderService extends utils_1.AbstractFileProviderService
+     }
+     async delete(file) {
+-        await cloudinary_1.v2.uploader.destroy(file.fileKey, { resource_type: "auto" });
++        await cloudinary_1.v2.uploader.destroy(file.fileKey, { resource_type: "image" });
+     }

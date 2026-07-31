@@ -154,6 +154,9 @@ module.exports = defineConfig({
         ],
       },
     },
+    homeBanner: {
+      resolve: "./src/modules/home-banner",
+    },
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
