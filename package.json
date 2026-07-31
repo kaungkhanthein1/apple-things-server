@@ -27,7 +27,8 @@
     "@medusajs/framework": "2.13.1",
     "@medusajs/medusa": "2.13.1",
     "@tsc_tech/medusa-plugin-cloudinary": "^1.0.0",
-    "medusa-file-cloudinary": "^1.0.2"
+    "medusa-file-cloudinary": "^1.0.2",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@medusajs/test-utils": "2.13.1",
