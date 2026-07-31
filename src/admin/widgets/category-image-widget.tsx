@@ -18,7 +18,7 @@ const CategoryImageWidget = ({ data: category }: DetailWidgetProps<AdminProductC
       const formData = new FormData()
       formData.append("files", file)
 
-      const uploadRes = await fetch("/store/uploads", {
+      const uploadRes = await fetch("/admin/uploads", {
         method: "POST",
         credentials: "include",
         body: formData,
