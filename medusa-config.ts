@@ -122,15 +122,7 @@ module.exports = defineConfig({
         },
       ]
 
-      const seenPluginKeys = new Set<string>()
-      config.plugins = (config.plugins ?? []).filter((plugin) => {
-        const key = `${plugin?.name ?? ""}:${plugin?.enforce ?? ""}`
-        if (seenPluginKeys.has(key)) {
-          return false
-        }
-        seenPluginKeys.add(key)
-        return true
-      })
+
 
       return
     },

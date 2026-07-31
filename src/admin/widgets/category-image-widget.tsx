@@ -1,12 +1,11 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
-import { Container, Heading, Button, Text, toast } from "@medusajs/ui"
+import { Container, Heading, Button, Text } from "@medusajs/ui"
 import type { DetailWidgetProps, AdminProductCategory } from "@medusajs/types"
 import { useState } from "react"
-import { useQueryClient } from "@tanstack/react-query"
 
 const CategoryImageWidget = ({ data: category }: DetailWidgetProps<AdminProductCategory>) => {
   const [uploading, setUploading] = useState(false)
-  const queryClient = useQueryClient()
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const currentImageUrl = (category.metadata?.image_url as string) || null
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,8 +13,8 @@ const CategoryImageWidget = ({ data: category }: DetailWidgetProps<AdminProductC
     if (!file) return
 
     setUploading(true)
+    setMessage(null)
     try {
-      // 1. Upload to /store/uploads
       const formData = new FormData()
       formData.append("files", file)
 
@@ -29,7 +28,6 @@ const CategoryImageWidget = ({ data: category }: DetailWidgetProps<AdminProductC
       const fileUrl = uploadData.files?.[0]?.url
       if (!fileUrl) throw new Error("Image URL missing from response")
 
-      // 2. Update category metadata
       const updateRes = await fetch(`/admin/product-categories/${category.id}`, {
         method: "POST",
         credentials: "include",
@@ -43,10 +41,10 @@ const CategoryImageWidget = ({ data: category }: DetailWidgetProps<AdminProductC
       })
       if (!updateRes.ok) throw new Error("Failed to update category metadata")
 
-      toast.success("Success", { description: "Category image updated successfully." })
-      queryClient.invalidateQueries({ queryKey: ["product_categories"] })
+      setMessage({ type: "success", text: "Category image updated successfully." })
+      setTimeout(() => window.location.reload(), 1000)
     } catch (error: any) {
-      toast.error("Error", { description: error.message || "An error occurred" })
+      setMessage({ type: "error", text: error.message || "An error occurred" })
     } finally {
       setUploading(false)
     }
@@ -68,6 +66,19 @@ const CategoryImageWidget = ({ data: category }: DetailWidgetProps<AdminProductC
           </div>
         ) : (
           <Text className="text-ui-fg-muted">No image attached.</Text>
+        )}
+
+        {message && (
+          <Text
+            className={
+              message.type === "success"
+                ? "text-ui-tag-green-text"
+                : "text-ui-tag-red-text"
+            }
+            size="small"
+          >
+            {message.text}
+          </Text>
         )}
 
         <div>
