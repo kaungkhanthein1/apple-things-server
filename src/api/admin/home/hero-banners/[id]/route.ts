@@ -1,25 +1,11 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework"
-import { z } from "zod"
 import { HOME_BANNER_MODULE } from "../../../../../modules/home-banner"
 import type { HomeBannerDTO, IHomeBannerModuleService } from "../../../../../modules/home-banner/types"
 
-const UpdateHomeBannerSchema = z.object({
-  title: z.string().trim().max(200).optional(),
-  image_url: z.string().trim().min(1).max(2000).optional(),
-  target_type: z.enum(["product", "collection", "category", "url", "none"]).optional(),
-  target_id: z.string().trim().max(200).optional().nullable(),
-  target_url: z.string().trim().max(2000).optional().nullable(),
-  sort_order: z.number().int().optional(),
-  is_active: z.boolean().optional(),
-  starts_at: z.string().trim().max(80).optional().nullable(),
-  ends_at: z.string().trim().max(80).optional().nullable(),
-})
+const VALID_TARGET_TYPES = ["product", "collection", "category", "url", "none"]
 
-function normalizeOptionalText(value: string | null | undefined): string | null {
-  if (typeof value !== "string") {
-    return null
-  }
-
+function normalizeOptionalText(value: unknown): string | null {
+  if (typeof value !== "string") return null
   const trimmed = value.trim()
   return trimmed.length > 0 ? trimmed : null
 }
@@ -50,27 +36,21 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
 export async function PATCH(req: MedusaRequest, res: MedusaResponse) {
   const homeBannerService = req.scope.resolve<IHomeBannerModuleService>(HOME_BANNER_MODULE)
-  const validationResult = UpdateHomeBannerSchema.safeParse(req.body)
+  const body = req.body as Record<string, unknown>
 
-  if (!validationResult.success) {
-    return res.status(400).json({
-      error: "Validation failed",
-      details: validationResult.error.issues,
-    })
-  }
-
-  const data = validationResult.data
   const updatePayload: Record<string, unknown> = { id: req.params.id }
 
-  if ("title" in data) updatePayload.title = data.title?.trim() ?? ""
-  if ("image_url" in data && data.image_url) updatePayload.image_url = data.image_url.trim()
-  if ("target_type" in data) updatePayload.target_type = data.target_type
-  if ("target_id" in data) updatePayload.target_id = normalizeOptionalText(data.target_id)
-  if ("target_url" in data) updatePayload.target_url = normalizeOptionalText(data.target_url)
-  if ("sort_order" in data) updatePayload.sort_order = data.sort_order
-  if ("is_active" in data) updatePayload.is_active = data.is_active
-  if ("starts_at" in data) updatePayload.starts_at = normalizeOptionalText(data.starts_at)
-  if ("ends_at" in data) updatePayload.ends_at = normalizeOptionalText(data.ends_at)
+  if ("title" in body) updatePayload.title = normalizeOptionalText(body.title) ?? ""
+  if ("image_url" in body && typeof body.image_url === "string") updatePayload.image_url = body.image_url.trim()
+  if ("target_type" in body && typeof body.target_type === "string" && VALID_TARGET_TYPES.includes(body.target_type)) {
+    updatePayload.target_type = body.target_type
+  }
+  if ("target_id" in body) updatePayload.target_id = normalizeOptionalText(body.target_id)
+  if ("target_url" in body) updatePayload.target_url = normalizeOptionalText(body.target_url)
+  if ("sort_order" in body) updatePayload.sort_order = body.sort_order
+  if ("is_active" in body) updatePayload.is_active = body.is_active
+  if ("starts_at" in body) updatePayload.starts_at = normalizeOptionalText(body.starts_at)
+  if ("ends_at" in body) updatePayload.ends_at = normalizeOptionalText(body.ends_at)
 
   const updated = await homeBannerService.updateHomeBanners(updatePayload)
   const banner = Array.isArray(updated) ? updated[0] : updated

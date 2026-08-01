@@ -1,31 +1,9 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework"
-import { z } from "zod"
 import { HOME_BANNER_MODULE } from "../../../../modules/home-banner"
 import type { HomeBannerDTO, IHomeBannerModuleService } from "../../../../modules/home-banner/types"
 import { sortHomeBanners } from "../../../../modules/home-banner/utils"
 
-const TargetTypeSchema = z.enum(["product", "collection", "category", "url", "none"])
-
-const CreateHomeBannerSchema = z.object({
-  title: z.string().trim().max(200).optional().default(""),
-  image_url: z.string().trim().min(1).max(2000),
-  target_type: TargetTypeSchema.default("none"),
-  target_id: z.string().trim().max(200).optional().nullable(),
-  target_url: z.string().trim().max(2000).optional().nullable(),
-  sort_order: z.number().int().optional().default(0),
-  is_active: z.boolean().optional().default(true),
-  starts_at: z.string().trim().max(80).optional().nullable(),
-  ends_at: z.string().trim().max(80).optional().nullable(),
-})
-
-function normalizeOptionalText(value: string | null | undefined): string | null {
-  if (typeof value !== "string") {
-    return null
-  }
-
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : null
-}
+const VALID_TARGET_TYPES = ["product", "collection", "category", "url", "none"]
 
 function mapBannerForAdmin(banner: HomeBannerDTO) {
   return {
@@ -44,6 +22,12 @@ function mapBannerForAdmin(banner: HomeBannerDTO) {
   }
 }
 
+function normalizeOptionalText(value: unknown): string | null {
+  if (typeof value !== "string") return null
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : null
+}
+
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const homeBannerService = req.scope.resolve<IHomeBannerModuleService>(HOME_BANNER_MODULE)
   const banners = await homeBannerService.listHomeBanners()
@@ -56,30 +40,29 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const homeBannerService = req.scope.resolve<IHomeBannerModuleService>(HOME_BANNER_MODULE)
-  const validationResult = CreateHomeBannerSchema.safeParse(req.body)
+  const body = req.body as Record<string, unknown>
 
-  if (!validationResult.success) {
-    return res.status(400).json({
-      error: "Validation failed",
-      details: validationResult.error.issues,
-    })
+  const image_url = typeof body.image_url === "string" ? body.image_url.trim() : ""
+  if (!image_url) {
+    return res.status(400).json({ error: "image_url is required" })
   }
 
-  const data = validationResult.data
+  const targetType = typeof body.target_type === "string" && VALID_TARGET_TYPES.includes(body.target_type)
+    ? body.target_type
+    : "none"
+
   const created = await homeBannerService.createHomeBanners({
-    title: data.title.trim(),
-    image_url: data.image_url.trim(),
-    target_type: data.target_type,
-    target_id: normalizeOptionalText(data.target_id),
-    target_url: normalizeOptionalText(data.target_url),
-    sort_order: data.sort_order,
-    is_active: data.is_active,
-    starts_at: normalizeOptionalText(data.starts_at),
-    ends_at: normalizeOptionalText(data.ends_at),
+    title: normalizeOptionalText(body.title) ?? "",
+    image_url,
+    target_type: targetType as any,
+    target_id: normalizeOptionalText(body.target_id),
+    target_url: normalizeOptionalText(body.target_url),
+    sort_order: typeof body.sort_order === "number" ? body.sort_order : 0,
+    is_active: typeof body.is_active === "boolean" ? body.is_active : true,
+    starts_at: normalizeOptionalText(body.starts_at),
+    ends_at: normalizeOptionalText(body.ends_at),
   })
   const banner = Array.isArray(created) ? created[0] : created
 
-  return res.status(201).json({
-    banner: mapBannerForAdmin(banner),
-  })
+  return res.status(201).json({ banner: mapBannerForAdmin(banner) })
 }
