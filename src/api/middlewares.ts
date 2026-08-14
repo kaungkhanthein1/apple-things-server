@@ -29,10 +29,10 @@ async function requireAdminWritePermission(req: any, res: any, next: any) {
     )
   }
 
+  const WRITE_OPERATIONS = ["create", "update", "delete", "write", "*"]
+
   const hasWriteAccess = user.rbac_roles.some((role: any) =>
-    role.policies?.some(
-      (p: any) => p.operation === "write" || p.operation === "*"
-    )
+    role.policies?.some((p: any) => WRITE_OPERATIONS.includes(p.operation))
   )
 
   if (!hasWriteAccess) {
