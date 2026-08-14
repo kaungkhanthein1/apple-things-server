@@ -126,6 +126,9 @@ module.exports = defineConfig({
     },
   },
   modules: {
+    rbac: {
+      resolve: "@medusajs/rbac",
+    },
     auth: {
       resolve: "@medusajs/auth",
       options: {

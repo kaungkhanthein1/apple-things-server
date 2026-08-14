@@ -25,6 +25,9 @@ importers:
       '@medusajs/medusa':
         specifier: 2.13.1
         version: 2.13.1(@medusajs/admin-sdk@2.13.1)(@medusajs/cli@2.13.1(@types/node@20.19.37))(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76))(@medusajs/test-utils@2.13.1)(@swc/core@1.15.18(@swc/helpers@0.5.19))(@types/node@20.19.37)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(awilix@8.0.1)(picomatch@4.0.3)(posthog-node@5.28.5(rxjs@7.8.2))(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(yalc@1.0.0-pre.53)
+      '@medusajs/rbac':
+        specifier: 2.13.1
+        version: 2.13.1(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76))
       '@tsc_tech/medusa-plugin-cloudinary':
         specifier: ^1.0.0
         version: 1.0.0(@medusajs/admin-sdk@2.13.1)(@medusajs/cli@2.13.1(@types/node@20.19.37))(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76))(@medusajs/medusa@2.13.1(@medusajs/admin-sdk@2.13.1)(@medusajs/cli@2.13.1(@types/node@20.19.37))(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76))(@medusajs/test-utils@2.13.1)(@swc/core@1.15.18(@swc/helpers@0.5.19))(@types/node@20.19.37)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(awilix@8.0.1)(picomatch@4.0.3)(posthog-node@5.28.5(rxjs@7.8.2))(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(yalc@1.0.0-pre.53))(@medusajs/test-utils@2.13.1(@medusajs/core-flows@2.13.1(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76)))(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76))(@medusajs/medusa@2.13.1))(@mikro-orm/cli@6.4.16(pg@8.20.0))(@mikro-orm/core@6.4.16)(@mikro-orm/knex@6.4.16(@mikro-orm/core@6.4.16)(pg@8.20.0))(@mikro-orm/migrations@6.4.16(@mikro-orm/core@6.4.16)(@types/node@20.19.37)(pg@8.20.0))(@mikro-orm/postgresql@6.4.16(@mikro-orm/core@6.4.16))(awilix@8.0.1)(pg@8.20.0)
@@ -1266,6 +1269,12 @@ packages:
 
   '@medusajs/promotion@2.13.1':
     resolution: {integrity: sha512-hJJTVOD7F71K6c2Llzo+BojSEFJtGBZbcmOEkdqbssT9NsOuUe8jRP1Tk+8jLHJiOZZWsmAQvKb4FHOGeyeN9Q==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@medusajs/framework': 2.13.1
+
+  '@medusajs/rbac@2.13.1':
+    resolution: {integrity: sha512-TgKXACNPhMHakfPQH3b/+IdLA/aOCwSe9X7E3hWGMr3StRyGv5Izrc3QObWHyY61QMxfTdzBtCfjGukoua3AZA==}
     engines: {node: '>=20'}
     peerDependencies:
       '@medusajs/framework': 2.13.1
@@ -8574,6 +8583,10 @@ snapshots:
       '@medusajs/framework': 2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76)
 
   '@medusajs/promotion@2.13.1(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76))':
+    dependencies:
+      '@medusajs/framework': 2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76)
+
+  '@medusajs/rbac@2.13.1(@medusajs/framework@2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76))':
     dependencies:
       '@medusajs/framework': 2.13.1(@medusajs/cli@2.13.1(@types/node@20.19.37))(@types/node@20.19.37)(ioredis@5.10.1)(vite@5.4.21(@types/node@20.19.37))(zod@3.25.76)
 

@@ -15,8 +15,9 @@
   "scripts": {
     "build": "medusa build && node scripts/patch-cloudinary.js",
     "seed": "medusa exec ./src/scripts/seed.ts",
+    "seed:guest": "medusa exec ./src/scripts/seed-guest.ts",
     "start": "medusa start",
-    "dev": "medusa develop",
+    "dev": "NODE_OPTIONS='--max-old-space-size=3072' medusa develop",
     "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
     "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
     "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit"
@@ -26,6 +27,7 @@
     "@medusajs/cli": "2.13.1",
     "@medusajs/framework": "2.13.1",
     "@medusajs/medusa": "2.13.1",
+    "@medusajs/rbac": "2.13.1",
     "@tsc_tech/medusa-plugin-cloudinary": "^1.0.0",
     "medusa-file-cloudinary": "^1.0.2"
   },
