@@ -5,6 +5,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
   admin: {
+    path: "/dashboard",
     brand: {
       title: "Apple Things",
     },
