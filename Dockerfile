@@ -14,6 +14,5 @@ COPY .npmrc .yarnrc.yml package-lock.json package.json pnpm-lock.yaml ./
 COPY patches ./patches
 RUN pnpm install --frozen-lockfile --prod
 COPY --from=build /app/.medusa ./.medusa
-COPY --from=build /app/node_modules/.medusa ./node_modules/.medusa
 EXPOSE 9000
 CMD ["pnpm", "start"]
