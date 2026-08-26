@@ -12,7 +12,7 @@ RUN pnpm build
 FROM base AS production
 WORKDIR /app/.medusa/server
 COPY --from=build /app/.medusa/server ./
-RUN npm install --omit=dev
+COPY --from=build /app/node_modules ./node_modules
 ENV NODE_ENV=production
 EXPOSE 9000
-CMD ["npm", "start"]
+CMD ["node", "node_modules/.bin/medusa", "start"]
